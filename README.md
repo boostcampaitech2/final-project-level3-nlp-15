@@ -13,4 +13,5 @@ DALL-E model adapted to Pokemon image generation domain.
 
 - [한국어 Pokemon Wiki (12000건)](https://pokemon.fandom.com/ko/wiki/대문)
 - [영어로 하면 Pokemon Wiki (18000건)](https://pokemon.fandom.com/wiki/Pikachu)
+- [Pokedex Wikipedia(11000건)](https://github.com/veekun/pokedex) | [데이터 예시](https://veekun.com/dex/pokemon/pikachu)
 
