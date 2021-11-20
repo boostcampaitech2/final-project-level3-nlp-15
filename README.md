@@ -1,4 +1,5 @@
 # Pokemon-DALLE
+
 DALL-E model adapted to Pokemon image generation domain.
 
 [👉 Notion Work Space](https://www.notion.so/Pokemon-Dall-E-de132b5ce0df4456af309cf336f77bec)
@@ -21,7 +22,7 @@ DALL-E model adapted to Pokemon image generation domain.
   - MIT License만 지키면 맘대로 사용 가능함.
 - [PokeAPI](https://pokeapi.co/about)
   - Pokedex와 2020년 4월까지는 동일했지만, Generation 8 데이터가 추가됨.
-
+  - [Python Wrapper for PokeAPI](https://github.com/PokeAPI/pokepy)
 
 ### GAN examples
 
