@@ -1,4 +1,5 @@
 .python-version
+CUB_200
 _clones
 *.pt
 /wandb
