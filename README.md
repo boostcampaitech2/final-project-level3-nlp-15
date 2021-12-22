@@ -1,55 +1,74 @@
-# Pokemon-DALLE
+# KoDALLE
 
-DALL-E model adapted to Pokemon image generation domain.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1sKNRH0fM73uLi-6BDgfGs3YiiVdvs6lU?usp=sharing) [![Wandb Log](https://raw.githubusercontent.com/wandb/assets/main/wandb-github-badge-gradient.svg)](https://wandb.ai/kodalle/KoDALLE)
 
-### 목표
+**Utilizing pretrained language model’s token embedding layer and position embedding layer as DALLE’s text encoder.**
 
-- Descriptive Text → Image Generation Model adapted to Pokemon Domain.
-- 3~4줄의 내용 → 64 x 64 pixel 혹은 225 x 225 pixel
-- **프로젝트 막바지에 BART → VQGAN으로 생성한 포켓몬 이미지들을 NFT화하고 등록하기**
+### Background
 
----
+- Training DALLE model from scratch demands large size paired dataset of images and captions. For example, OpenAI DALLE is trained with more than 250 million text-image pairs for the training.
+- If the dataset isn’t large enough or is limited to specific domains, number of vocabularies in the trained DALLE model are insufficient. For instance, 1 million text captions of K-Fashion dataset only consists of more or less than 300 tokens.
+- Therefore, inferencing from such DALLE models could be problematic if the given sentence query is unconnected to the originally trained captions’ text dataset.
 
-### 데이터셋
+### KoDALLE's Result on Small Size Fashion Dataset
+
+**The team constructed Text to Fashion Design DALLE model in Korean language with less than 100k text-image sampled pairs.**
+
+|                     |                                                                                                                                                                                                                                                                                                                       |
+| :-----------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|     **Caption**     | 스타일에서 스타일은 리조트이다. 스타일에서 서브스타일은 모던이다. 원피스에서 기장은 미디이다. 원피스에서 색상은 와인이다. 원피스에서 카테고리는 드레스이다. 원피스에서 소매기장은 반팔이다. 원피스에서 소재에는 저지이다. 원피스에서 프린트에는 무지이다. 원피스에서 넥라인은 라운드넥이다. 원피스에서 핏은 루즈이다. |
+| **Generated Image** |                                                                                                  <img height="250" width="200" alt="image" src="./assets/README/media_images_image_24608_55e11a71258b471865e1.png">                                                                                                   |
+
+|                     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| :-----------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|     **Caption**     | 스타일에서 스타일은 컨트리이다. 스타일에서 서브스타일은 리조트이다. 하의에서 기장은 미디이다. 하의에서 색상은 베이지이다. 하의에서 카테고리는 스커트이다. 하의에서 디테일에는 플리츠이다. 하의에서 소재에는 실크이다. 하의에서 프린트에는 무지이다. 하의에서 핏은 루즈이다. 상의에서 기장은 롱이다. 상의에서 색상은 핑크이다. 상의에서 카테고리는 티셔츠이다. 상의에서 소매기장은 7부소매이다. 상의에서 소재에는 니트이다. 상의에서 프린트에는 무지이다. 상의에서 넥라인은 라운드넥이다. |
+| **Generated Image** |                                                                                                                                                                                    <img height="250" width="200" alt="image" src="./assets/README/media_images_image_28908_91e2bc39b17071668b52.png">                                                                                                                                                                                    |
+
+|                     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| :-----------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|     **Caption**     | 스타일에서 스타일은 로맨틱이다. 아우터에서 색상은 라벤더이다. 아우터에서 카테고리는 가디건이다. 아우터에서 디테일에는 단추이다. 아우터에서 소매기장은 반팔이다. 아우터에서 소재에는 니트이다. 아우터에서 프린트에는 무지이다. 아우터에서 넥라인은 브이넥이다. 아우터에서 핏은 노멀이다. 하의에서 기장은 미니이다. 하의에서 색상은 화이트이다. 하의에서 카테고리는 스커트이다. 하의에서 디테일에는 셔링이다. 하의에서 소재에는 우븐이다. 하의에서 프린트에는 무지이다 |
+| **Generated Image** |                                                                                                                                                                          <img height="250" width="200" alt="image" src="./assets/README/media_images_image_30062_e9379e6774258bb45373.png">                                                                                                                                                                          |
+
+|                     |                                                                                                                                                                                                                                                                             |
+| :-----------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|     **Caption**     | 스타일에서 스타일은 키치이다. 스타일에서 서브스타일은 스트리트이다. 하의에서 기장은 발목이다. 하의에서 색상은 블루이다. 하의에서 서브색상은 화이트이다. 하의에서 카테고리는 청바지이다. 하의에서 디테일에는 자수이다. 하의에서 소재에는 데님이다. 하의에서 핏은 스키니이다. |
+| **Generated Image** |                                                                                              <img height="250" width="200" alt="image" src="./assets/README/media-pants.png">                                                                                               |
+
+### Methodology
+
+Experimentations were conducted with the following Korean Transformers Models’ embedding layers. The team selected klue/roberta-large as baseline in the repository considering the size of the model.
+
+- **[klue/roberta-large](https://huggingface.co/klue/roberta-large): Vocab Size of 32000, Embedding Dimension of 1024.**
+- [KoGPT Trinity of SKT](https://huggingface.co/skt/ko-gpt-trinity-1.2B-v0.5): Vocab Size of 51200, Embedding Dimension of 1920.
+- [KoGPT of Kakao Brain](https://huggingface.co/kakaobrain/kogpt): Vocab Size of 64512, Embedding Dimension of 4096.
+
+KoDALLE with klue/roberta-large's wpe and wte which is trainable on 16GB GPU Google Colab environment. Hyperparams related to the DALLE's model size are following.
 
 ```
-지금의 포켓몬스터의 디자인이 나오기까지 디자인을 담당하는 스기모리 켄이 약 300여가지의 스케치를 그렸다. 그 후 사내 인기투표까지 하면서 다시 그려낸 150여마리의 포켓몬을 엄선하게 되었다. 포켓몬의 수는 시리즈가 나올 때마다 100마리, 135마리, 107마리, 156마리, 72마리, 86마리, 2마리[12], 82마리, 7마리[13]가 추가되어 8세대까지 총 898마리가 되었다.
+'BATCH_SIZE': 32
+'DEPTH': 2
+'TEXT_SEQ_LEN': 128
+'VOCAB_SIZE': 32000
+'MODEL_DIM': 1024
+'ATTN_TYPES': 'full'
+'DIM_HEAD': 64
+'HEADS': 8
 ```
 
-- [Pokedex 898 마리](https://github.com/veekun/pokedex) | [데이터 예시: PokeSprite](https://msikma.github.io/pokesprite/overview/dex-gen8.html)
-  - Pokemon Shapes: wings, squiggle, fish...
-  - 한국어도 있음.
-  - MIT License만 지키면 맘대로 사용 가능함.
-  - [Python Wrapper for Pokedex](https://github.com/PokeDevs/pokedex.py.git)
-- [PokeAPI](https://pokeapi.co/about)
-  - Pokedex와 2020년 4월까지는 동일했지만, Generation 8 데이터가 추가됨.
-  - [Python Wrapper for PokeAPI](https://github.com/PokeAPI/pokepy)
+- DALLE model is composed on [lucidrain's DALLE-pytorch](https://github.com/lucidrains/DALLE-pytorch)
+- Image encoder is constructed based on [VQGAN(Taming Transformers)](https://github.com/CompVis/taming-transformers#training-on-custom-data)
+
+### Significance
+
+- Suggests effortless method of creating DALLE model for their own languages if pretrained language model is available.
+- Introduces solution for domain specific DALLE models to be robust on input sentence queries.
 
 ---
 
-### GAN examples
+### WIP
 
-- [Generating Pokemon with StyleGAN](https://www.youtube.com/watch?v=YM7NIwvsWcs) | [Code](https://colab.research.google.com/github/derekphilipau/machinelearningforartists/blob/main/stylegan2_ada_pytorch_pokemon.ipynb#scrollTo=R7JvPMLWy95f)
-- [Generating Pokemon with AEGAN](https://github.com/ConorLazarou/PokeGAN)
-- [Generating Pokemon with DCGAN](https://github.com/patrickbrightly/PokeGAN)
-
----
-
-### [👉 Notion Work Space](https://www.notion.so/Pokemon-Dall-E-de132b5ce0df4456af309cf336f77bec)
-
-### 제안 배경 - 차별점
-
-- 컨셉을 기반으로 몬스터 디자인을 새로 만들어야 하는 게임 회사들에게 어필하기 좋은 프로젝트이다. (ex: 닌텐도의 포켓몬, 넥슨의 메이플스토리, 블리자드의 디아블로, NC의 리니지 등)
-- 현재 오픈되어 있는 Mini-DALLE 같은 경우는 포켓몬 생성에 있어서는 취약하다. 따라서 Pokemon-DALLE가 다른 DALLE들과는 차별점을 가질 수 있다고 생각한다.
-- 최소한 Multimodal을 시도해봤다는 경험이 다른 회사들에게도 어필이 될 거라고 생각한다. Domain Specific하게 DALLE를 만들어 보는 경험도 다른 개발자들에게 유의미하게 다가올 것 같다.
-- 포켓몬은 옛날 컨텐츠임에도 불구하고 Pokemon Go 등의 새로운 형식을 좋아하는 해외 팬덤층이 두텁다. 따라서 해당 프로젝트를 pokemon reddit 등 커뮤니티에 알리면 꽤나 많은 유저들을 유입시키거나, 혹은 유명세를 탈 수 있다고 생각한다.
-- 데이터셋을 새롭게 모아야 프로젝트 결과가 차별화된다. 그렇지만 정형화된 데이터셋을 새로 모으기는 힘든데, 포켓몬은 오픈소스 SQL 데이터가 있다. 위키피디아 데이터셋 정제 및 훈련하는 것도 시중에 자료가 많이 있다.
-
-### 제안배경 - 현실성
-
-- OpenAI의 DALL-E처럼 넓은 domain의 multimodal은 32GB GPU로 하기에는 한계가 분명히 있다. 이를 Pokemon domain으로 좁힌다면, 주어진 컴퓨팅 리소스로 실험을 해볼 수 있다고 생각한다.
-- 포켓몬 위키피디아 데이터가 각 포켓몬의 type을 분류해놓았기 때문에, Conditional Generation이 가능하기도 하다. 따라서 description을 직접 서술형으로 입력하는 대신에 유저에게 드롭다운으로 객관식으로 선택할 수 있게끔 할 수도 있다. (ex: 전기속성, 모양새, 크기 등)
-- Pokemon 게임은 역사가 오래됐기 때문에, 유저들은 저화질 포켓몬들에 익숙하다. 포켓몬 이미지들은 64 x 64 pixel, 96 x 96 pixel 정도로 경량 이미지들이다. 따라서 32GB GPU를 이용하여 훈련하기에도 적합하다.
-- 시중에 사용할 수 있는 Pokemon 데이터셋이 많고, 성공한 것으로 보이는 GAN 프로젝트들이 많기 때문에 학습에도 용이하다고 생각한다.
-- 포켓몬의 "진화" 개념은 GAN의 Train epoch에 따른 변화로 표현할 수도 있다.
-- Pokemon-DALLE가 만든 포켓몬을 NFT화시키면 상징성과 성취감이 있을 거라고 생각한다. 내가 만든 포켓몬을 소장하고 싶은 욕구는 누구나 갖고 있을 거라고 생각하기 때문이다.
+- [ ] Add image-caption reranker(EfficientNet + Klue/roberta-large)
+- [ ] Model trained with 500k text-image pairs.
+- [ ] Modulize in python code.
+- [x] Update Inference code.
+- [ ] Update FID and IS metrics on test and validation dataset.
